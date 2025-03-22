@@ -22,10 +22,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     
-    - name: Install uv
-      run: |
-        pip install uv
-    
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v5
+
     - name: Create virtual environment and install dependencies
       run: |
         uv venv
