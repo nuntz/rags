@@ -116,14 +116,10 @@ class TestCommandLineArguments:
         mock_transformer.return_value = MagicMock()
         
         # Mock process_files to return False (failure)
-        mock_process.return_value = asyncio.Future()
-        mock_process.return_value.set_result(False)
+        mock_process.return_value = False
         
         # Execute
         await main()
-        
-        # Print the actual calls to help debug
-        print(f"Actual print calls: {mock_print.mock_calls}")
         
         # Assert
         mock_print.assert_any_call("Error processing documentation files.")
