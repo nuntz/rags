@@ -8,6 +8,9 @@ from pathlib import Path
 import chromadb
 from sentence_transformers import SentenceTransformer
 
+# Version information
+__version__ = "0.1.0"
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from pydantic_ai import Agent
@@ -19,8 +22,10 @@ from rags.retriever import search_documents, process_files
 async def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='RAGS - Retrieval-Augmented Generation System')
-    parser.add_argument('docs_path', type=str,
+    parser.add_argument('docs_path', type=str, nargs='?',
                       help='Path to the documentation directory or a specific markdown file')
+    parser.add_argument('--version', action='store_true',
+                      help='Display the version number and exit')
     parser.add_argument('--force-reload', action='store_true',
                       help='Force reprocessing of all files')
     parser.add_argument('--collection-name', type=str, default='default_collection',
@@ -37,6 +42,17 @@ async def main():
                       help='Model name to use (default: gpt-4o)')
     
     args = parser.parse_args()
+    
+    # Handle version display
+    if args.version:
+        print(f"RAGS version {__version__}")
+        return
+    
+    # Ensure docs_path is provided if not displaying version
+    if not args.docs_path:
+        parser.print_help()
+        print("\nError: docs_path is required unless --version is specified")
+        return
     
     try:
         # Initialize components

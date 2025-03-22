@@ -52,6 +52,7 @@ rags /path/to/your/markdown/docs
 
 ### Options
 
+- `--version`: Display the version number and exit
 - `--force-reload`: Force reprocessing of all files, even if they haven't changed
 - `--collection-name NAME`: Use a specific collection name in the vector database (default: "default_collection")
 - `--db-path PATH`: Specify the path to store the ChromaDB database (default: "~/.local/share/rags/chroma_db")
