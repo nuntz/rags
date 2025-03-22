@@ -132,7 +132,9 @@ async def main():
 def main_cli():
     """Entry point for the CLI command."""
     import asyncio
-    asyncio.run(main())
+    # Call main() to get the coroutine and then run it
+    coro = main()
+    asyncio.run(coro)
 
 # Allow this module to be imported without running main()
 if __name__ == "__main__":
