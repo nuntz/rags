@@ -16,7 +16,7 @@ class TestCommandLineArguments:
     @patch('argparse.ArgumentParser.parse_args')
     @patch('builtins.print')
     @patch('rags.main.create_llm_model')
-    @patch('rags.main.process_files')
+    @patch('rags.main.process_files', new_callable=AsyncMock)
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
     async def test_version_flag(self, mock_transformer, mock_chroma, mock_process, 
@@ -197,9 +197,9 @@ class TestMainLoop:
         mock_args.return_value.model_name = "test-model"
         
         # Ensure process_files returns True to continue execution
-        # For an async mock, we need to configure it to return a coroutine that resolves to True
-        mock_process.return_value = asyncio.Future()
-        mock_process.return_value.set_result(True)
+        future = asyncio.Future()
+        future.set_result(True)
+        mock_process.return_value = future
         
         # Mock user input sequence: one query, then exit
         mock_input.side_effect = ["How does this work?", "exit"]
