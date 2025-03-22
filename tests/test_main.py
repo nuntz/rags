@@ -100,7 +100,8 @@ class TestCommandLineArguments:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    async def test_process_files_failure(self, mock_transformer, mock_chroma, 
+    @patch('rags.main.create_llm_model')  # Add this to prevent exceptions
+    async def test_process_files_failure(self, mock_llm, mock_transformer, mock_chroma, 
                                         mock_print, mock_process, mock_args, mock_makedirs):
         """Test handling of process_files failure."""
         # Setup
@@ -110,12 +111,19 @@ class TestCommandLineArguments:
         mock_args.return_value.collection_name = "default_collection"
         mock_args.return_value.db_path = "~/.local/share/rags/chroma_db"
         
+        # Ensure no exceptions from these mocks
+        mock_chroma.return_value = MagicMock()
+        mock_transformer.return_value = MagicMock()
+        
         # Mock process_files to return False (failure)
         mock_process.return_value = asyncio.Future()
         mock_process.return_value.set_result(False)
         
         # Execute
         await main()
+        
+        # Print the actual calls to help debug
+        print(f"Actual print calls: {mock_print.mock_calls}")
         
         # Assert
         mock_print.assert_any_call("Error processing documentation files.")
