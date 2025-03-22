@@ -22,5 +22,7 @@ jobs:
         enable-cache: true
     - name: Sync
       run: uv sync
+    - name: Install Pytest
+      run: uv pip install pytest pytest-cov pytest-asyncio
     - name: Test
       run: uv run --frozen pytest  # Uses the Python version automatically installed by uv
