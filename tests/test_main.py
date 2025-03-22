@@ -54,12 +54,11 @@ class TestCommandLineArguments:
         mock_process.assert_not_called()
     
     @patch('argparse.ArgumentParser.parse_args')
-    @patch('os.makedirs')
     @patch('rags.main.process_files')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
     async def test_custom_arguments(self, mock_transformer, mock_chroma, 
-                                   mock_process, mock_makedirs, mock_args):
+                                   mock_process, mock_args):
         """Test that custom arguments are properly passed to components."""
         # Setup
         mock_args.return_value.version = False
@@ -76,10 +75,11 @@ class TestCommandLineArguments:
         mock_process.return_value = False
         
         # Execute
-        await main()
-        
-        # Assert
-        mock_makedirs.assert_called_with("/test/db", exist_ok=True)
+        with patch('os.makedirs') as mock_makedirs:
+            await main()
+            
+            # Assert
+            mock_makedirs.assert_called_with("/test/db", exist_ok=True)
         mock_chroma.assert_called_with(path="/test/db")
         mock_process.assert_called_with(
             "/test/docs", 
@@ -126,7 +126,8 @@ class TestMainLoop:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    async def test_exit_commands(self, mock_transformer, mock_chroma, mock_print, 
+    @patch('os.makedirs')
+    async def test_exit_commands(self, mock_makedirs, mock_transformer, mock_chroma, mock_print, 
                                mock_input, mock_agent, mock_llm, mock_process, mock_args):
         """Test that exit and quit commands terminate the loop."""
         # Setup
@@ -169,7 +170,8 @@ class TestMainLoop:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    async def test_query_processing(self, mock_transformer, mock_chroma, mock_print, 
+    @patch('os.makedirs')
+    async def test_query_processing(self, mock_makedirs, mock_transformer, mock_chroma, mock_print, 
                                   mock_input, mock_agent, mock_llm, mock_process, mock_args):
         """Test that user queries are processed correctly."""
         # Setup
@@ -212,7 +214,8 @@ class TestMainLoop:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    async def test_exception_handling(self, mock_transformer, mock_chroma, mock_print, 
+    @patch('os.makedirs')
+    async def test_exception_handling(self, mock_makedirs, mock_transformer, mock_chroma, mock_print, 
                                     mock_input, mock_agent, mock_llm, mock_process, mock_args):
         """Test that exceptions are properly caught and reported."""
         # Setup
