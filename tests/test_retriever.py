@@ -10,7 +10,9 @@ from unittest.mock import MagicMock, patch, AsyncMock
 import chromadb
 import numpy as np
 
+from unittest.mock import MagicMock, patch, AsyncMock, create_autospec
 from pydantic_ai import RunContext
+import pytest_asyncio
 
 from rags.models import RAGDependencies
 from rags.retriever import search_documents, process_files
@@ -31,7 +33,11 @@ class TestSearchDocuments:
     @pytest.fixture
     def mock_context(self, mock_deps):
         """Create a mock RunContext with dependencies."""
-        return RunContext(deps=mock_deps)
+        # Create a mock RunContext with all required parameters
+        mock_context = create_autospec(RunContext)
+        # Set the deps attribute directly
+        mock_context.deps = mock_deps
+        return mock_context
 
     @pytest.mark.asyncio
     async def test_empty_collection(self, mock_context):
