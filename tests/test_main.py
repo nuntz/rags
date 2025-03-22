@@ -270,13 +270,14 @@ class TestMainCLI:
     """Tests for the main_cli function."""
     
     @patch('asyncio.run')
-    def test_main_cli(self, mock_run):
+    @patch('rags.main.main')
+    def test_main_cli(self, mock_main, mock_run):
         """Test that main_cli calls asyncio.run with main function."""
         # Execute
         main_cli()
         
         # Assert
         mock_run.assert_called_once()
-        # Check that asyncio.run was called with the main coroutine
-        # We can't use callable() since coroutine objects aren't callable
-        assert mock_run.call_args[0][0].__name__ == 'main'
+        # Instead of accessing the coroutine directly, we verify that
+        # asyncio.run was called with the result of main()
+        mock_run.assert_called_with(mock_main.return_value)
