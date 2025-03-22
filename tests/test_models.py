@@ -1,7 +1,7 @@
 """Tests for the models module."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import chromadb
 from sentence_transformers import SentenceTransformer
 
@@ -61,8 +61,8 @@ class TestLLMModelCreation:
         custom_key = "test-api-key"
         custom_model = "gpt-3.5-turbo"
         
-        # Create a dummy model to avoid initialization issues
-        dummy_model = MagicMock(spec=OpenAIModel)
+        # Create a dummy model using Mock instead of MagicMock to avoid async issues
+        dummy_model = Mock(spec=OpenAIModel)
         dummy_model.model_name = custom_model
         
         with patch("rags.models.OpenAIModel", return_value=dummy_model), \
