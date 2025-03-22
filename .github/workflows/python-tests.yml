@@ -20,5 +20,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
+    - name: Sync
+      run: uv sync
     - name: Test
       run: uv run --frozen pytest  # Uses the Python version automatically installed by uv
