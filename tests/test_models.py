@@ -61,20 +61,30 @@ class TestLLMModelCreation:
         custom_key = "test-api-key"
         custom_model = "gpt-3.5-turbo"
         
-        # Create a dummy model using Mock instead of MagicMock to avoid async issues
-        dummy_model = Mock(spec=OpenAIModel)
-        dummy_model.model_name = custom_model
+        # Instead of mocking OpenAIModel directly, mock the provider and test the function call
+        mock_provider = Mock()
         
-        with patch("rags.models.OpenAIModel", return_value=dummy_model), \
-             patch("rags.models.OpenAIProvider"):
-            model = create_llm_model(
+        with patch("rags.models.OpenAIProvider", return_value=mock_provider) as provider_mock, \
+             patch("rags.models.OpenAIModel") as model_mock:
+            
+            # Call the function
+            create_llm_model(
                 base_url=custom_url,
                 api_key=custom_key,
                 model_name=custom_model
             )
             
-            assert model is dummy_model
-            assert model.model_name == custom_model
+            # Verify the provider was created with correct parameters
+            provider_mock.assert_called_once_with(
+                base_url=custom_url,
+                api_key=custom_key
+            )
+            
+            # Verify the model was created with correct parameters
+            model_mock.assert_called_once_with(
+                custom_model,
+                provider=mock_provider
+            )
     
     @patch("rags.models.OpenAIProvider")
     def test_connection_error_handling(self, mock_provider):
