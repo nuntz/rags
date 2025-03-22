@@ -73,7 +73,8 @@ class TestCommandLineArguments:
         mock_args.return_value.model_name = "test-model"
         
         # Mock process_files to return False to exit early
-        mock_process.return_value = False
+        mock_process.return_value = asyncio.Future()
+        mock_process.return_value.set_result(False)
         
         # Execute
         await main()
@@ -109,7 +110,8 @@ class TestCommandLineArguments:
         mock_args.return_value.db_path = "~/.local/share/rags/chroma_db"
         
         # Mock process_files to return False (failure)
-        mock_process.return_value = False
+        mock_process.return_value = asyncio.Future()
+        mock_process.return_value.set_result(False)
         
         # Execute
         await main()
@@ -189,7 +191,9 @@ class TestMainLoop:
         mock_args.return_value.model_name = "test-model"
         
         # Ensure process_files returns True to continue execution
-        mock_process.return_value = True
+        # For an async mock, we need to configure it to return a coroutine that resolves to True
+        mock_process.return_value = asyncio.Future()
+        mock_process.return_value.set_result(True)
         
         # Mock user input sequence: one query, then exit
         mock_input.side_effect = ["How does this work?", "exit"]
