@@ -184,7 +184,11 @@ class TestMainLoop:
         mock_args.return_value.collection_name = "default_collection"
         mock_args.return_value.db_path = "~/.local/share/rags/chroma_db"
         mock_args.return_value.request_limit = 50
+        mock_args.return_value.llm_url = "http://test-llm:8080/v1"
+        mock_args.return_value.api_key = "test-key"
+        mock_args.return_value.model_name = "test-model"
         
+        # Ensure process_files returns True to continue execution
         mock_process.return_value = True
         
         # Mock user input sequence: one query, then exit
@@ -193,6 +197,7 @@ class TestMainLoop:
         # Mock agent response
         mock_agent_instance = MagicMock()
         mock_agent.return_value = mock_agent_instance
+        mock_agent_instance.tool = MagicMock()  # Mock the tool method
         
         mock_result = MagicMock()
         mock_result.data = "This is how it works..."
