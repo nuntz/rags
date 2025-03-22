@@ -143,8 +143,8 @@ Second paragraph."""
     
     def test_different_overlap_settings(self):
         """Test with different overlap settings."""
-        # Create a paragraph with distinct words
-        words = [f"word{i}" for i in range(300)]
+        # Create a paragraph with distinct words - using more words to ensure chunking
+        words = [f"word{i}" for i in range(1000)]
         text = "# Header\n" + " ".join(words)
         
         # Test with small overlap
