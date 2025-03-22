@@ -175,15 +175,15 @@ class TestMainLoop:
     
     @patch('os.makedirs')
     @patch('argparse.ArgumentParser.parse_args')
-    @patch('rags.main.process_files')
+    @patch('rags.main.process_files', new_callable=AsyncMock)
     @patch('rags.main.create_llm_model')
-    @patch('pydantic_ai.Agent')
+    @patch('rags.main.Agent')  # Changed from pydantic_ai.Agent to rags.main.Agent
     @patch('builtins.input')
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    async def test_query_processing(self, mock_transformer, mock_chroma, mock_print, 
-                                  mock_input, mock_agent, mock_llm, mock_process, mock_args, mock_makedirs):
+    async def test_query_processing(self, mock_transformer, mock_chroma, mock_print,
+                                mock_input, mock_agent, mock_llm, mock_process, mock_args, mock_makedirs):
         """Test that user queries are processed correctly."""
         # Setup
         mock_args.return_value.version = False
@@ -196,37 +196,45 @@ class TestMainLoop:
         mock_args.return_value.api_key = "test-key"
         mock_args.return_value.model_name = "test-model"
         
-        # Ensure process_files returns True to continue execution
+        # Make process_files return True
         mock_process.return_value = True
         
         # Mock user input sequence: one query, then exit
         mock_input.side_effect = ["How does this work?", "exit"]
         
-        # Mock agent response
-        mock_agent_instance = MagicMock()
-        mock_agent.return_value = mock_agent_instance
-        mock_agent_instance.tool = MagicMock()  # Mock the tool method
+        # Mock LLM model
+        mock_model = MagicMock()
+        mock_llm.return_value = mock_model
         
-        # Create a proper async mock for the run method
-        mock_result = MagicMock()
-        mock_result.data = "This is how it works..."
+        # Set up a more complete agent mock
+        agent_instance = MagicMock()
+        mock_agent.return_value = agent_instance
         
-        # Create a future that will be returned by the run method
-        future_result = asyncio.Future()
-        future_result.set_result(mock_result)
+        # Mock the tool registration
+        agent_instance.tool.return_value = None
         
-        # Set up the run method to return this future
-        mock_agent_instance.run = AsyncMock()
-        mock_agent_instance.run.return_value = future_result
+        # Mock the result for run
+        result = MagicMock()
+        result.data = "This is how it works..."
+        
+        # Setup the run method with a proper AsyncMock
+        run_mock = AsyncMock(return_value=result)
+        agent_instance.run = run_mock
         
         # Execute
         await main()
         
-        # Assert
-        # Ensure the run method was called
-        assert mock_agent_instance.run.called, "Agent.run() was not called"
-        # Check the arguments
-        call_args = mock_agent_instance.run.call_args[0]
+        # Debug assertions
+        assert mock_process.called, "process_files was not called"
+        assert mock_llm.called, "create_llm_model was not called"
+        assert mock_agent.called, "Agent constructor was not called"
+        assert agent_instance.tool.called, "Agent.tool() was not called"
+        
+        # Main assertion - check if run was called
+        assert agent_instance.run.called, "Agent.run() was not called"
+        
+        # If we get this far, check the arguments to run
+        call_args = agent_instance.run.call_args[0]
         assert call_args[0] == "How does this work?"
         
         # Check that the result was printed
