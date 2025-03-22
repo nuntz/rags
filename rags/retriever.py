@@ -107,7 +107,11 @@ async def process_files(docs_path, collection_name, embedding_model, chroma_clie
     files_to_process = []
     for file_path in markdown_files:
         file_hash = calculate_file_hash(file_path)
-        rel_path = str(file_path.relative_to(Path.cwd()) if file_path.is_absolute() else file_path)
+        try:
+            rel_path = str(file_path.relative_to(Path.cwd())) if file_path.is_absolute() else str(file_path)
+        except ValueError:
+            # If the file is not in a subpath of the current directory, use the full path
+            rel_path = str(file_path)
         
         if rel_path not in registry or registry[rel_path]["hash"] != file_hash:
             files_to_process.append(file_path)
@@ -135,7 +139,11 @@ async def process_files(docs_path, collection_name, embedding_model, chroma_clie
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 
-            rel_path = str(file_path.relative_to(Path.cwd()) if file_path.is_absolute() else file_path)
+            try:
+                rel_path = str(file_path.relative_to(Path.cwd())) if file_path.is_absolute() else str(file_path)
+            except ValueError:
+                # If the file is not in a subpath of the current directory, use the full path
+                rel_path = str(file_path)
             print(f"Processing {rel_path}...")
             chunks = split_markdown_into_chunks(content, rel_path)
             
