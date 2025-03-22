@@ -53,12 +53,13 @@ class TestCommandLineArguments:
         mock_print.assert_called_with("\nError: docs_path is required unless --version is specified")
         mock_process.assert_not_called()
     
+    @patch('os.makedirs')
     @patch('argparse.ArgumentParser.parse_args')
     @patch('rags.main.process_files')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
     async def test_custom_arguments(self, mock_transformer, mock_chroma, 
-                                   mock_process, mock_args):
+                                   mock_process, mock_args, mock_makedirs):
         """Test that custom arguments are properly passed to components."""
         # Setup
         mock_args.return_value.version = False
@@ -75,11 +76,11 @@ class TestCommandLineArguments:
         mock_process.return_value = False
         
         # Execute
-        with patch('os.makedirs') as mock_makedirs:
-            await main()
-            
-            # Assert
-            mock_makedirs.assert_called_with("/test/db", exist_ok=True)
+        await main()
+        
+        # Assert
+        # Use assert_any_call instead of assert_called_with to handle multiple calls
+        mock_makedirs.assert_any_call("/test/db", exist_ok=True)
         mock_chroma.assert_called_with(path="/test/db")
         mock_process.assert_called_with(
             "/test/docs", 
@@ -118,6 +119,7 @@ class TestCommandLineArguments:
 class TestMainLoop:
     """Tests for the main interactive loop."""
     
+    @patch('os.makedirs')
     @patch('argparse.ArgumentParser.parse_args')
     @patch('rags.main.process_files')
     @patch('rags.main.create_llm_model')
@@ -126,9 +128,8 @@ class TestMainLoop:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    @patch('os.makedirs')
-    async def test_exit_commands(self, mock_makedirs, mock_transformer, mock_chroma, mock_print, 
-                               mock_input, mock_agent, mock_llm, mock_process, mock_args):
+    async def test_exit_commands(self, mock_transformer, mock_chroma, mock_print, 
+                               mock_input, mock_agent, mock_llm, mock_process, mock_args, mock_makedirs):
         """Test that exit and quit commands terminate the loop."""
         # Setup
         mock_args.return_value.version = False
@@ -162,6 +163,7 @@ class TestMainLoop:
         # Assert
         mock_agent.return_value.run.assert_not_called()
     
+    @patch('os.makedirs')
     @patch('argparse.ArgumentParser.parse_args')
     @patch('rags.main.process_files')
     @patch('rags.main.create_llm_model')
@@ -170,9 +172,8 @@ class TestMainLoop:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    @patch('os.makedirs')
-    async def test_query_processing(self, mock_makedirs, mock_transformer, mock_chroma, mock_print, 
-                                  mock_input, mock_agent, mock_llm, mock_process, mock_args):
+    async def test_query_processing(self, mock_transformer, mock_chroma, mock_print, 
+                                  mock_input, mock_agent, mock_llm, mock_process, mock_args, mock_makedirs):
         """Test that user queries are processed correctly."""
         # Setup
         mock_args.return_value.version = False
@@ -206,6 +207,7 @@ class TestMainLoop:
         # Check that the result was printed
         mock_print.assert_any_call("This is how it works...")
 
+    @patch('os.makedirs')
     @patch('argparse.ArgumentParser.parse_args')
     @patch('rags.main.process_files')
     @patch('rags.main.create_llm_model')
@@ -214,9 +216,8 @@ class TestMainLoop:
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
-    @patch('os.makedirs')
-    async def test_exception_handling(self, mock_makedirs, mock_transformer, mock_chroma, mock_print, 
-                                    mock_input, mock_agent, mock_llm, mock_process, mock_args):
+    async def test_exception_handling(self, mock_transformer, mock_chroma, mock_print, 
+                                    mock_input, mock_agent, mock_llm, mock_process, mock_args, mock_makedirs):
         """Test that exceptions are properly caught and reported."""
         # Setup
         mock_args.return_value.version = False
