@@ -8,8 +8,7 @@ from pathlib import Path
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-# Version information
-__version__ = "0.1.0"
+from rags.version import __version__
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
