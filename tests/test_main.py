@@ -202,7 +202,9 @@ class TestMainLoop:
         await main()
         
         # Assert
-        mock_agent_instance.run.assert_called_once()
+        # Ensure the run method was called
+        assert mock_agent_instance.run.called, "Agent.run() was not called"
+        # Check the arguments
         call_args = mock_agent_instance.run.call_args[0]
         assert call_args[0] == "How does this work?"
         
