@@ -37,7 +37,7 @@ class TestCommandLineArguments:
     @patch('argparse.ArgumentParser.parse_args')
     @patch('argparse.ArgumentParser.print_help')
     @patch('builtins.print')
-    @patch('rags.main.process_files')
+    @patch('rags.main.process_files', new_callable=AsyncMock)
     async def test_missing_docs_path(self, mock_process, mock_print, 
                                     mock_print_help, mock_args):
         """Test behavior when required docs_path is missing."""
@@ -197,9 +197,7 @@ class TestMainLoop:
         mock_args.return_value.model_name = "test-model"
         
         # Ensure process_files returns True to continue execution
-        future = asyncio.Future()
-        future.set_result(True)
-        mock_process.return_value = future
+        mock_process.return_value = True
         
         # Mock user input sequence: one query, then exit
         mock_input.side_effect = ["How does this work?", "exit"]
@@ -209,9 +207,17 @@ class TestMainLoop:
         mock_agent.return_value = mock_agent_instance
         mock_agent_instance.tool = MagicMock()  # Mock the tool method
         
+        # Create a proper async mock for the run method
         mock_result = MagicMock()
         mock_result.data = "This is how it works..."
-        mock_agent_instance.run = AsyncMock(return_value=mock_result)
+        
+        # Create a future that will be returned by the run method
+        future_result = asyncio.Future()
+        future_result.set_result(mock_result)
+        
+        # Set up the run method to return this future
+        mock_agent_instance.run = AsyncMock()
+        mock_agent_instance.run.return_value = future_result
         
         # Execute
         await main()
