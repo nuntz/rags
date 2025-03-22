@@ -144,14 +144,15 @@ Second paragraph."""
     def test_different_overlap_settings(self):
         """Test with different overlap settings."""
         # Create a paragraph with distinct words - using more words to ensure chunking
-        words = [f"word{i}" for i in range(1000)]
+        # Each word is about 6 chars, so 200 words is ~1200 chars
+        words = [f"word{i}" for i in range(200)]
         text = "# Header\n" + " ".join(words)
         
-        # Test with small overlap
-        chunks_small = split_markdown_into_chunks(text, "test.md", max_chunk_size=500, overlap=50)
+        # Test with small overlap - max_chunk_size small enough to force multiple chunks
+        chunks_small = split_markdown_into_chunks(text, "test.md", max_chunk_size=400, overlap=50)
         
         # Test with large overlap
-        chunks_large = split_markdown_into_chunks(text, "test.md", max_chunk_size=500, overlap=200)
+        chunks_large = split_markdown_into_chunks(text, "test.md", max_chunk_size=400, overlap=200)
         
         # Both should have multiple chunks
         assert len(chunks_small) > 1
