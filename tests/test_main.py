@@ -143,7 +143,8 @@ class TestMainLoop:
         mock_args.return_value.db_path = "~/.local/share/rags/chroma_db"
         mock_args.return_value.request_limit = 50
         
-        mock_process.return_value = True
+        mock_process.return_value = asyncio.Future()
+        mock_process.return_value.set_result(True)
         
         # Test with 'exit' command
         mock_input.return_value = "exit"
