@@ -163,8 +163,10 @@ class TestProcessFiles:
         """Create a mock ChromaDB client."""
         client = MagicMock()
         collection = MagicMock()
+        # Set up get_collection to return the collection (default behavior)
         client.get_collection.return_value = collection
         client.create_collection.return_value = collection
+        # Don't raise an exception by default for get_collection
         return client
 
     @pytest.mark.asyncio
@@ -184,9 +186,9 @@ class TestProcessFiles:
             
             # Verify results
             assert result is True
-            # Collection should be created but no documents added
-            mock_chroma_client.create_collection.assert_called_once()
-            collection = mock_chroma_client.create_collection.return_value
+            # Collection should be retrieved but no documents added
+            mock_chroma_client.get_collection.assert_called_once_with(name="test_collection")
+            collection = mock_chroma_client.get_collection.return_value
             collection.add.assert_not_called()
 
     @pytest.mark.asyncio
@@ -214,7 +216,7 @@ class TestProcessFiles:
             
             # Verify results
             assert result is True
-            collection = mock_chroma_client.create_collection.return_value
+            collection = mock_chroma_client.get_collection.return_value
             collection.add.assert_called_once()
             # Check that the registry was created
             registry_path = os.path.join(temp_dir, "data", "file_registry.json")
