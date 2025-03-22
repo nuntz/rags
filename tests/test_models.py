@@ -52,9 +52,9 @@ class TestLLMModelCreation:
         
         assert isinstance(model, OpenAIModel)
         assert model.model_name == "gpt-4o"
-        # Access the provider configuration through the model's configuration
-        assert model.provider_config.base_url == "http://127.0.0.1:8080/v1"
-        assert model.provider_config.api_key == "not-needed"
+        # Access the provider directly
+        assert model.provider.base_url == "http://127.0.0.1:8080/v1"
+        assert model.provider.api_key == "not-needed"
     
     def test_custom_parameters(self):
         """Test create_llm_model with custom parameters."""
@@ -70,8 +70,8 @@ class TestLLMModelCreation:
         
         assert isinstance(model, OpenAIModel)
         assert model.model_name == custom_model
-        assert model.provider_config.base_url == custom_url
-        assert model.provider_config.api_key == custom_key
+        assert model.provider.base_url == custom_url
+        assert model.provider.api_key == custom_key
     
     @patch("rags.models.OpenAIProvider")
     def test_connection_error_handling(self, mock_provider):
