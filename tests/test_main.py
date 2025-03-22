@@ -94,13 +94,14 @@ class TestCommandLineArguments:
         assert call_args[4] == "/test/db"
         assert call_args[5] == True
     
+    @patch('os.makedirs')
     @patch('argparse.ArgumentParser.parse_args')
     @patch('rags.main.process_files')
     @patch('builtins.print')
     @patch('chromadb.PersistentClient')
     @patch('sentence_transformers.SentenceTransformer')
     async def test_process_files_failure(self, mock_transformer, mock_chroma, 
-                                        mock_print, mock_process, mock_args):
+                                        mock_print, mock_process, mock_args, mock_makedirs):
         """Test handling of process_files failure."""
         # Setup
         mock_args.return_value.version = False
