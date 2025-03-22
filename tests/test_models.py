@@ -55,14 +55,13 @@ class TestLLMModelCreation:
         # We can't directly access the provider, so we'll just verify the model was created
         # The create_llm_model function itself shows the default values being used
     
-    @pytest.mark.asyncio
-    async def test_custom_parameters(self):
+    def test_custom_parameters(self):
         """Test create_llm_model with custom parameters."""
         custom_url = "https://api.example.com/v1"
         custom_key = "test-api-key"
         custom_model = "gpt-3.5-turbo"
         
-        # Create a dummy model to avoid async initialization issues
+        # Create a dummy model to avoid initialization issues
         dummy_model = MagicMock(spec=OpenAIModel)
         dummy_model.model_name = custom_model
         
