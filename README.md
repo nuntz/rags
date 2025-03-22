@@ -145,11 +145,49 @@ The script can be easily modified to:
 
 Look for the relevant parameters and functions in the code to make adjustments.
 
+## Utility Functions
+
+RAGS includes several utility functions that handle core functionality:
+
+### File Hash Calculation
+- Calculates MD5 hashes of files to detect changes
+- Used to determine which files need reprocessing
+- Handles various file types including empty and binary files
+
+### Markdown Chunking
+- Splits markdown documents into semantically meaningful chunks
+- Preserves header hierarchy for context
+- Implements intelligent overlap between chunks for better retrieval
+- Handles various markdown structures and sizes
+
+### File Registry
+- Tracks processed files and their metadata
+- Stores file hashes and processing timestamps
+- Supports nested directory structures
+
+All utility functions are thoroughly tested with comprehensive test coverage.
+
 ## Limitations
 
 - Designed for text content in Markdown format
 - Performance depends on the quality of your local LLM and embedding model
 - No support for authentication or HTTPS for the LLM server connection
+
+## Development
+
+### Testing
+
+Run the test suite with pytest:
+
+```bash
+pytest
+```
+
+To run tests with coverage reporting:
+
+```bash
+pytest --cov=rags
+```
 
 ## License
 
