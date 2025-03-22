@@ -2,6 +2,8 @@
 
 A Retrieval-Augmented Generation (RAG) system built with PydanticAI and Chroma DB that allows you to query your Markdown documentation using a local LLM server.
 
+[![Python Tests](https://github.com/nuntz/rags/actions/workflows/python-tests.yml/badge.svg)](https://github.com/nuntz/rags/actions/workflows/python-tests.yml)
+
 ## Features
 
 - **Document Processing**: Automatically processes Markdown files, breaking them into semantically meaningful chunks
