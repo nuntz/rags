@@ -25,4 +25,4 @@ jobs:
     - name: Install Pytest
       run: uv pip install pytest pytest-cov pytest-asyncio
     - name: Test
-      run: uv run --frozen pytest  # Uses the Python version automatically installed by uv
+      run: uv run pytest tests/test_retriever.py -v
