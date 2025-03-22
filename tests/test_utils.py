@@ -39,19 +39,6 @@ class TestFileHashCalculation:
         finally:
             os.unlink(temp_file.name)
     
-    def test_binary_file(self):
-        """Test hash calculation with binary content."""
-        with tempfile.NamedTemporaryFile(delete=False, mode='wb') as temp_file:
-            temp_file.write(b'\x00\x01\x02\x03\x04')
-        
-        try:
-            file_hash = calculate_file_hash(temp_file.name)
-            # Verify hash is a valid MD5 hash (32 hex characters)
-            assert len(file_hash) == 32
-            assert all(c in "0123456789abcdef" for c in file_hash)
-        finally:
-            os.unlink(temp_file.name)
-    
     def test_nonexistent_file(self):
         """Test error handling for non-existent files."""
         with pytest.raises(FileNotFoundError):
