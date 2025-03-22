@@ -14,27 +14,11 @@ jobs:
         python-version: ['3.13']
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'
-    
+    - name: Checkout the repository
+      uses: actions/checkout@main
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v5
-
-    - name: Create virtual environment and install dependencies
-      run: |
-        uv venv
-        source .venv/bin/activate
-        if [ -f uv.lock ]; then
-          uv pip sync uv.lock
-        fi
-        uv pip install -e .
-    
-    - name: Run tests
-      run: |
-        source .venv/bin/activate
-        pytest
+      with:
+        enable-cache: true
+    - name: Test
+      run: uv run --frozen pytest  # Uses the Python version automatically installed by uv
