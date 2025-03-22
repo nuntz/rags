@@ -29,6 +29,12 @@ async def main():
                       help='Path to the ChromaDB database directory')
     parser.add_argument('--request-limit', type=int, default=50,
                       help='Maximum number of requests to make to the LLM (default: 50)')
+    parser.add_argument('--llm-url', type=str, default="http://127.0.0.1:8080/v1",
+                      help='URL for the LLM server (default: http://127.0.0.1:8080/v1)')
+    parser.add_argument('--api-key', type=str, default="not-needed",
+                      help='API key for the LLM server (default: not-needed)')
+    parser.add_argument('--model-name', type=str, default="gpt-4o",
+                      help='Model name to use (default: gpt-4o)')
     
     args = parser.parse_args()
     
@@ -55,8 +61,12 @@ async def main():
             print("Error processing documentation files.")
             return
         
-        # Create LLM model with default settings
-        local_model = create_llm_model()
+        # Create LLM model with settings from command line arguments
+        local_model = create_llm_model(
+            base_url=args.llm_url,
+            api_key=args.api_key,
+            model_name=args.model_name
+        )
         
         # Create agent
         rag_agent = Agent(

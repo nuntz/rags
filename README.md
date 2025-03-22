@@ -56,6 +56,9 @@ rags /path/to/your/markdown/docs
 - `--collection-name NAME`: Use a specific collection name in the vector database (default: "default_collection")
 - `--db-path PATH`: Specify the path to store the ChromaDB database (default: "~/.local/share/rags/chroma_db")
 - `--request-limit N`: Set the maximum number of requests to make to the LLM (default: 50)
+- `--llm-url URL`: Specify the URL for the LLM server (default: "http://127.0.0.1:8080/v1")
+- `--api-key KEY`: Provide an API key for the LLM server (default: "not-needed")
+- `--model-name NAME`: Specify the model name to use (default: "gpt-4o")
 
 ### Examples
 
@@ -82,6 +85,11 @@ rags ./documentation --collection-name my_project_docs --db-path ~/myproject/vec
 Set a custom request limit for the LLM:
 ```bash
 rags ./documentation --request-limit 100
+```
+
+Connect to a different LLM server:
+```bash
+rags ./documentation --llm-url http://localhost:1234/v1 --api-key your-api-key --model-name llama3
 ```
 
 ## Data Storage
