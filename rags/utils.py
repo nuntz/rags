@@ -15,94 +15,38 @@ def calculate_file_hash(file_path):
 
 # Function to split text into chunks
 def split_markdown_into_chunks(text, filename, max_chunk_size=1000, overlap=200):
-    # Split by headers
-    header_pattern = r'(#{1,6}\s+.+)'
-    sections = re.split(header_pattern, text)
+    """Split text into chunks of maximum size with overlap between chunks."""
+    if not text.strip():
+        return []
     
     chunks = []
-    current_header = ""
-    current_chunk = ""
+    words = text.split()
+    current_chunk = []
+    current_length = 0
     
-    for i, section in enumerate(sections):
-        # Check if this section is a header
-        if i % 2 == 1:
-            # If we have content from previous section, add it as a chunk
-            if current_chunk:
-                metadata = {
-                    "source": str(filename),
-                    "header": current_header
-                }
-                chunks.append((current_chunk.strip(), metadata))
-                current_chunk = ""
-                
-            current_header = section.strip()
-            continue
+    for word in words:
+        # Add word length plus space
+        word_length = len(word) + 1
+        
+        if current_length + word_length > max_chunk_size and current_chunk:
+            # Create chunk with current words
+            chunk_text = ' '.join(current_chunk)
+            metadata = {"source": str(filename), "header": ""}
+            chunks.append((chunk_text.strip(), metadata))
             
-        # If we have content, process it
-        if section.strip():
-            # Split the content into paragraphs
-            paragraphs = section.strip().split('\n\n')
-            
-            for paragraph in paragraphs:
-                if not paragraph.strip():
-                    continue
-                
-                # Check if current chunk plus this paragraph would exceed max size
-                if len(current_chunk) + len(paragraph) > max_chunk_size and current_chunk:
-                    metadata = {
-                        "source": str(filename),
-                        "header": current_header
-                    }
-                    chunks.append((current_chunk.strip(), metadata))
-                    
-                    # Start a new chunk with overlap
-                    words = current_chunk.split()
-                    overlap_text = ' '.join(words[-int(overlap/5):]) if len(words) > int(overlap/5) else current_chunk
-                    current_chunk = overlap_text + " " + paragraph
-                else:
-                    # Add paragraph to current chunk
-                    if current_chunk:
-                        current_chunk += " " + paragraph
-                    else:
-                        current_chunk = paragraph
-                
-                # Check if the current chunk is already too large
-                # This handles cases where a single paragraph exceeds max_chunk_size
-                while len(current_chunk) > max_chunk_size:
-                    # Take the first max_chunk_size characters (approximately)
-                    words = current_chunk.split()
-                    chunk_words = []
-                    chunk_length = 0
-                    
-                    for word in words:
-                        if chunk_length + len(word) + 1 > max_chunk_size:
-                            break
-                        chunk_words.append(word)
-                        chunk_length += len(word) + 1  # +1 for space
-                    
-                    if not chunk_words:  # If a single word is too long
-                        chunk_words = [words[0]]
-                    
-                    chunk_text = ' '.join(chunk_words)
-                    metadata = {
-                        "source": str(filename),
-                        "header": current_header
-                    }
-                    chunks.append((chunk_text.strip(), metadata))
-                    
-                    # Remove the processed part from current_chunk with overlap
-                    overlap_words = chunk_words[-int(overlap/5):] if len(chunk_words) > int(overlap/5) else chunk_words
-                    overlap_text = ' '.join(overlap_words)
-                    remaining_text = current_chunk[len(chunk_text):]
-                    current_chunk = overlap_text + remaining_text
+            # Start new chunk with overlap
+            overlap_size = min(len(current_chunk), int(overlap/5))
+            current_chunk = current_chunk[-overlap_size:] if overlap_size > 0 else []
+            current_length = sum(len(w) + 1 for w in current_chunk)
+        
+        current_chunk.append(word)
+        current_length += word_length
     
-    # Don't forget to add the last chunk
+    # Add the last chunk if there's anything left
     if current_chunk:
-        metadata = {
-            "source": str(filename),
-            "header": current_header
-        }
-        chunks.append((current_chunk.strip(), metadata))
+        chunk_text = ' '.join(current_chunk)
+        metadata = {"source": str(filename), "header": ""}
+        chunks.append((chunk_text.strip(), metadata))
     
     return chunks
 
