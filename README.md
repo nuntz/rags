@@ -157,10 +157,10 @@ RAGS includes several utility functions that handle core functionality:
 - Handles various file types including empty and binary files
 
 ### Markdown Chunking
-- Splits markdown documents into semantically meaningful chunks
-- Preserves header hierarchy for context
-- Implements intelligent overlap between chunks for better retrieval
-- Handles various markdown structures and sizes
+- Splits text into simple chunks of configurable size
+- Implements overlap between chunks for better retrieval
+- Handles documents of various sizes efficiently
+- Uses a straightforward word-based chunking approach
 
 ### File Registry
 - Tracks processed files and their metadata
